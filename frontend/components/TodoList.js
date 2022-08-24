@@ -5,6 +5,7 @@ import Todo from './Todo'
 //Renders the complete todo list
 export default class TodoList extends React.Component {
   render() {
+    console.log(this.props)
     return (
       <div>
         {this.props.allTodos.map(item => {

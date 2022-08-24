@@ -6,18 +6,6 @@ import TodoList from './TodoList'
 
 const URL = 'http://localhost:9000/api/todos'
 
-//SHOULD NOT NEED THIS:
-// const todos = [{
-//   name: 'Do dishes',
-//   id: 0,
-//   completed: false
-// }, 
-// {
-//   name: 'Clean room',
-//   id: 1, 
-//   completed: false
-// }]
-
 export default class App extends React.Component {
   constructor(){
     super()
@@ -79,18 +67,29 @@ export default class App extends React.Component {
   }
 
   //submit changes:
-  handleFormSubmit = e => {
+  handleFormSubmit = (e) => {
     e.preventDefault()
 
-    //prevents adding nothing as a todo
-    if(this.state.input === ""){
+    const newTodo = {
+      name: this.state.input,
+      id: Date.now(),
+      completed: false
+    }
+    
+    if(this.state.input === ''){
       null
     }
-    else(this.addTodo(this.state.input))
-
-    //resets the input + placeholder text
-    e.target.reset()
-    this.setState({input: ''})
+    else{
+    axios
+      .post(URL, newTodo)
+      .then(res => this.setState({
+        todos: res.data.data
+      }))
+      .catch(err => console.log(err))
+      .finally(this.setState({
+        input: ''
+      }))
+    }
   }
 
   //Clearing completed todos:
