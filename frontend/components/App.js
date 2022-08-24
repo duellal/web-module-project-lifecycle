@@ -50,15 +50,19 @@ export default class App extends React.Component {
   addTodo = (item) => {
     const newTodo = {
       name: item,
-      id: Date.now(),
       completed: false
     }
 
-    const newTodos = [...this.state.todos, newTodo]
+    this.setState([...this.state.todos, newTodo])
 
-    this.setState({
-      todos: newTodos
-    })
+    //NEED TO WORK ON TO GET THE TODO TO POST TO API W/O BREAKING:
+    // axios
+    //   .post(URL, newTodo)
+    //   .then(res => this.setState({
+    //     todos: res.data.data
+    //   }))
+    //   .catch(err => console.log(err))
+
   }
 
   //input changes:
@@ -67,29 +71,18 @@ export default class App extends React.Component {
   }
 
   //submit changes:
-  handleFormSubmit = (e) => {
+  handleFormSubmit = e => {
     e.preventDefault()
 
-    const newTodo = {
-      name: this.state.input,
-      id: Date.now(),
-      completed: false
-    }
-    
-    if(this.state.input === ''){
+    //prevents adding nothing as a todo
+    if(this.state.input === ""){
       null
     }
-    else{
-    axios
-      .post(URL, newTodo)
-      .then(res => this.setState({
-        todos: res.data.data
-      }))
-      .catch(err => console.log(err))
-      .finally(this.setState({
-        input: ''
-      }))
-    }
+    else(this.addTodo(this.state.input))
+
+    //resets the input + placeholder text
+    e.target.reset()
+    this.setState({input: ''})
   }
 
   //Clearing completed todos:
@@ -103,10 +96,18 @@ export default class App extends React.Component {
     this.setState({
       todos: newTodos
     })
+
+    //NEED TO WORK ON FOR DELETING TODOS IN API LIST:
+    // axios
+    //   .patch(`${URL}/9`, newTodos)
+    //   .then(res => console.log(res))
+    //   .catch(err => console.log(err))
+
   }
 
   
   render() {
+    console.log('App Todos:', this.state.todos)
     return (
       <div>
         <div>
