@@ -29,40 +29,9 @@ export default class App extends React.Component {
   //TodoList Component Handlers:
   //Crossing out an item once clicked on
   toggleTodo = (id) => {
-   const newTodoList = this.state.todos.map(item => {
-    if(item.id === id){
-      return {
-        ...item, completed: !item.completed
-      }
-    }
-    else{
-      return(item)
-    }
-   })
-
-   this.setState({
-    todos: newTodoList
-   })
-  }
-
-  //Form Component Handlers: 
-  //Adding an item to the list:
-  addTodo = (item) => {
-    const newTodo = {
-      name: item,
-      completed: false
-    }
-
-    this.setState([...this.state.todos, newTodo])
-
-    //NEED TO WORK ON TO GET THE TODO TO POST TO API W/O BREAKING:
-    // axios
-    //   .post(URL, newTodo)
-    //   .then(res => this.setState({
-    //     todos: res.data.data
-    //   }))
-    //   .catch(err => console.log(err))
-
+    axios
+      .patch(`${URL}/${id}`)
+      .catch(err => console.log(err))
   }
 
   //input changes:
@@ -70,44 +39,60 @@ export default class App extends React.Component {
     this.setState({ input: e.target.value })
   }
 
-  //submit changes:
+  //submit changes - posting the request to the api:
   handleFormSubmit = e => {
     e.preventDefault()
 
-    //prevents adding nothing as a todo
-    if(this.state.input === ""){
-      null
+    const newTodo = {
+      name: this.state.input,
+      completed: false
     }
-    else(this.addTodo(this.state.input))
+
+    axios
+      .post(URL, newTodo)
+      .then(res => { 
+        this.setState([...this.state.todos, res.data.data])
+        return this.state.todos
+      })
+      .catch(err => console.log(err))
 
     //resets the input + placeholder text
     e.target.reset()
     this.setState({input: ''})
   }
 
-  //Clearing completed todos:
+//Making the Todo show in the DOM once the post request happens:
+  componentDidUpdate(prevProps, prevState){
+    if(this.state.todos !== prevState.todos){
+      axios
+      .get(URL)
+      .then(res => 
+        this.setState({
+          todos: res.data.data
+        })
+        )
+      .catch(err => console.log(err))
+    }
+  }
+
+  //"Clearing" completed todos:
   clearCompletedTodos = (e) => {
     e.preventDefault()
 
-    const newTodos = this.state.todos.filter(item => {
-      return(item.completed === false)
-    })
-
-    this.setState({
-      todos: newTodos
-    })
-
-    //NEED TO WORK ON FOR DELETING TODOS IN API LIST:
-    // axios
-    //   .patch(`${URL}/9`, newTodos)
-    //   .then(res => console.log(res))
-    //   .catch(err => console.log(err))
-
+    //This would work if the CDU (above) didn't get the whole url for the get request. I tried filtering the get request, which works, but I wan't to be able to decide when I want to see the completed todos, instead of them just "deleting" from the dom
+    axios
+      .get(URL)
+      .then(res => {
+        this.setState({
+          todos: res.data.data.filter(item => {
+            return (item.completed === false)
+            })
+          })
+      })
   }
 
   
   render() {
-    console.log('App Todos:', this.state.todos)
     return (
       <div>
         <div>
@@ -119,8 +104,6 @@ export default class App extends React.Component {
         </div>
         <div>
           <Form 
-          addTodo={this.addTodo}
-          allTodos={this.state.todos}
           handleFormValue={this.state.input}
           handleFormChanges={this.handleFormChanges}
           handleFormSubmit={this.handleFormSubmit}
