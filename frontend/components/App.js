@@ -80,6 +80,8 @@ export default class App extends React.Component {
     e.preventDefault()
 
     //This would work if the CDU (above) didn't get the whole url for the get request. I tried filtering the get request, which works, but I wan't to be able to decide when I want to see the completed todos, instead of them just "deleting" from the dom
+    
+    //I did try to use axios.delete() to delete the tasks that were completed, but it would not work - my guess for this is that the mock-server does not allow to use axios.delete()
     axios
       .get(URL)
       .then(res => {
